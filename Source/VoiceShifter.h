@@ -44,6 +44,10 @@ public:
         }
         ratio=targetRatio;
     }
+    void reset() {
+        for(auto& channel:ring) std::fill(channel.begin(),channel.end(),0.f);
+        write=0; phase=.5; period=sr/220; ratio=1;
+    }
 private:
     float read(int channel,float delay) const {
         double position=write-double(delay); int base=int(std::floor(position)); float f=float(position-base);

@@ -10,7 +10,7 @@ inline juce::var presetJson(const juce::ValueTree& state,const juce::String& nam
     auto tree=upgradeState(state.createCopy());
     auto root=new juce::DynamicObject; auto values=new juce::DynamicObject;
     root->setProperty("magic","SUITUNES_STS"); root->setProperty("format","SuitunesPreset");
-    root->setProperty("formatVersion",1); root->setProperty("productVersion","0.2.0"); root->setProperty("name",name);
+    root->setProperty("formatVersion",1); root->setProperty("productVersion","0.3.0"); root->setProperty("productName","Pitch Pop"); root->setProperty("name",name);
     values->setProperty("key",keyNames[int(stateValue(tree,"root"))]);
     values->setProperty("scale",scaleNames[int(stateValue(tree,"scale"))]);
     juce::Array<juce::var> notes;

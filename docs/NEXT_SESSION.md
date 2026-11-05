@@ -1,3 +1,5 @@
+> November 5 Pitch Pop update: current user scope and implementation checkpoint are in [PITCH_POP_AUDIT.md](PITCH_POP_AUDIT.md). Older blue-branding, correction-toggle and default-engine statements below are historical. Natural-vocal/FL acceptance is still open.
+
 # Resume here — November 5, 2026
 
 ## Actual listening result

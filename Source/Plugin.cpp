@@ -16,7 +16,9 @@ public:
     LockedMetadata metadata(){return LockedMetadata(*this);}
     static juce::AudioProcessorValueTreeState::ParameterLayout layout() {
         juce::AudioProcessorValueTreeState::ParameterLayout p;
-        p.add(std::make_unique<juce::AudioParameterBool>(juce::ParameterID{"enabled",1}, "Correction enabled", false));
+        // Keep the legacy ID/index so existing FL automation/state still loads.
+        p.add(std::make_unique<juce::AudioParameterBool>(juce::ParameterID{"enabled",1}, "Legacy correction flag (ignored)", true,
+            juce::AudioParameterBoolAttributes().withAutomatable(false)));
         p.add(std::make_unique<juce::AudioParameterChoice>(juce::ParameterID{"root",1}, "Key", juce::StringArray{"C","C#","D","D#","E","F","F#","G","G#","A","A#","B"}, 0));
         p.add(std::make_unique<juce::AudioParameterChoice>(juce::ParameterID{"scale",1}, "Scale", juce::StringArray{"Chromatic","Major","Minor","Custom"}, 0));
         p.add(std::make_unique<juce::AudioParameterFloat>(juce::ParameterID{"amount",1}, "Correction Strength", 0.0f, 1.0f, 1.0f));
@@ -24,7 +26,7 @@ public:
         p.add(std::make_unique<juce::AudioParameterFloat>(juce::ParameterID{"mix",1}, "Wet mix", 0.0f, 1.0f, 1.0f));
         p.add(std::make_unique<juce::AudioParameterBool>(juce::ParameterID{"bypass",1}, "Bypass", false));
         p.add(std::make_unique<juce::AudioParameterChoice>(juce::ParameterID{"mode",1}, "Engine (change while stopped)",
-            juce::StringArray{"Full voice: 16 ms / 65+ Hz", "Live: 10 ms / 110+ Hz", "Legacy spectral: 120 ms"}, 0,
+            juce::StringArray{"Experimental full voice: 16 ms / 65+ Hz", "Experimental live: 10 ms / 110+ Hz", "Quality: 150 ms / formants"}, 2,
             juce::AudioParameterChoiceAttributes().withAutomatable(false)));
         p.add(std::make_unique<juce::AudioParameterInt>(juce::ParameterID{"mask",1},"Custom notes",0,4095,4095));
         p.add(std::make_unique<juce::AudioParameterFloat>(juce::ParameterID{"formant",1},"Formant",-12.0f,12.0f,0.0f));
@@ -40,7 +42,7 @@ public:
         state.state.setProperty("schema", 2, nullptr); state.addParameterListener("mode",this); startTimerHz(5);
     }
     ~SuitunesProcessor() override { stopTimer(); state.removeParameterListener("mode",this); cancelPendingUpdate(); }
-    const juce::String getName() const override { return "Suitunes"; }
+    const juce::String getName() const override { return "Pitch Pop"; }
     void prepareToPlay(double sr, int) override { midiTargets.reset(); midiNote=-1; engine.prepare(sr,getTotalNumInputChannels(),selectedMode()); activeMode=int(selectedMode()); setLatencySamples(engine.latencySamples()); }
     void releaseResources() override {}
     bool isBusesLayoutSupported(const BusesLayout& b) const override {
@@ -49,7 +51,7 @@ public:
     suitunes::Settings settingsSnapshot() const {
         auto get=[this](size_t i){return raw[i]->load(std::memory_order_relaxed);};
         suitunes::Settings s;
-        s.enabled=get(0)>.5f&&get(6)<.5f; s.root=int(get(1)); s.scale=int(get(2)); s.amount=get(3); s.retuneMs=get(4); s.mix=get(5);
+        s.enabled=get(6)<.5f; s.root=int(get(1)); s.scale=int(get(2)); s.amount=get(3); s.retuneMs=get(4); s.mix=get(5);
         s.mask=int(get(8)); s.formant=get(9); s.vibratoMode=int(get(10)); s.vibratoDepth=get(11); s.vibratoRate=get(12); s.drift=get(13); s.midiEnabled=get(14)>.5f; s.midiTarget=midiNote.load(); return s;
     }
     void setPreview(std::shared_ptr<const juce::AudioBuffer<float>> buffer,double rate,bool retainPosition=false) {
@@ -59,7 +61,15 @@ public:
     void seekPreview(double seconds) { const juce::ScopedLock lock(getCallbackLock()); previewPosition=std::max(0.0,seconds*previewRate); }
     void run(juce::AudioBuffer<float>& b, juce::MidiBuffer& midi, bool bypassed) {
         juce::ScopedNoDenormals noDenormals;
-        bool playing=false; if(auto* ph=getPlayHead()) if(auto pos=ph->getPosition()) playing=pos->getIsPlaying(); transportPlaying=playing;
+        bool playing=false,hasPosition=false; int64_t position=0;
+        if(auto* ph=getPlayHead()) if(auto pos=ph->getPosition()) {
+            playing=pos->getIsPlaying();
+            if(auto time=pos->getTimeInSamples()){hasPosition=true;position=*time;}
+        }
+        if(playing!=wasPlaying || (playing && hasPosition && positionValid && position!=nextHostSample)) {
+            engine.reset(); midiTargets.reset(); midiNote=-1;
+        }
+        wasPlaying=playing; positionValid=hasPosition; nextHostSample=position+b.getNumSamples(); transportPlaying=playing;
         auto s=settingsSnapshot(); s.enabled=s.enabled&&!bypassed&&!fineViewActive.load();
         if(previewPlaying.load()&&preview&&getSampleRate()>0) {
             const double step=previewRate/getSampleRate();
@@ -84,12 +94,12 @@ public:
             midiNote=midiTargets.target(); s.midiTarget=midiNote.load(); cursor=offset;
         }
         if(cursor<b.getNumSamples()) engine.process(b,s,cursor,b.getNumSamples()-cursor);
-        hz.store(engine.pitch().hz); confidence.store(engine.pitch().confidence); shift.store(engine.correctionSemitones());
+        hz.store(engine.pitch().hz); confidence.store(engine.pitch().confidence); shift.store(engine.correctionSemitones());target.store(engine.targetMidi());
         float outputRms=0;for(int c=0;c<b.getNumChannels();++c)if(b.getNumSamples()>0)outputRms=std::max(outputRms,b.getRMSLevel(c,0,b.getNumSamples()));outputLevel=outputRms;
         telemetrySamples+=b.getNumSamples();
         if(telemetrySamples>=int(getSampleRate()*.025)) {
             telemetrySamples=0;auto& frame=telemetry[size_t(telemetrySerial%telemetry.size())];float f=hz.load();float note=f>0?suitunes::midiFromHz(f):0;
-            frame.note.store(note,std::memory_order_relaxed);frame.target.store(note>0?note+shift.load():0,std::memory_order_relaxed);frame.level.store(inputLevel.load(),std::memory_order_relaxed);
+            frame.note.store(note,std::memory_order_relaxed);frame.target.store(target.load(),std::memory_order_relaxed);frame.level.store(inputLevel.load(),std::memory_order_relaxed);
             telemetryCount.store(++telemetrySerial,std::memory_order_release);
         }
     }
@@ -117,7 +127,7 @@ public:
     bool hasEditor() const override { return true; }
     juce::AudioProcessorEditor* createEditor() override;
     juce::AudioProcessorValueTreeState state;
-    std::atomic<float> hz{0}, confidence{0}, shift{0};
+    std::atomic<float> hz{0}, confidence{0}, shift{0},target{0};
     std::atomic<float> inputLevel{0},outputLevel{0};
     std::atomic<int> midiNote{-1},activeMode{0};
     std::atomic<bool> previewPlaying{false},transportPlaying{false};
@@ -130,6 +140,8 @@ public:
     std::atomic<uint64_t>telemetryCount{0};
 private:
     juce::CriticalSection metadataLock;
+    bool wasPlaying=false,positionValid=false;
+    int64_t nextHostSample=0;
     int telemetrySamples=0;uint64_t telemetrySerial=0;
     std::array<std::atomic<float>*,suitunes::parameters.size()> raw{};
     suitunes::MidiTargets midiTargets;
@@ -151,6 +163,22 @@ private:
 #include "PluginEditor.h"
 juce::AudioProcessorEditor* SuitunesProcessor::createEditor() { return new SuitunesEditor(*this); }
 juce::AudioProcessor* JUCE_CALLTYPE createPluginFilter() { return new SuitunesProcessor; }
+
+bool verifyPitchPopKeyboardPolicy() {
+    SuitunesProcessor processor; SuitunesSurface surface(processor);
+    auto focusDisabled=[](auto&& self,const juce::Component& c)->bool {
+        if(c.getWantsKeyboardFocus())return false;
+        if(auto* slider=dynamic_cast<const juce::Slider*>(&c);slider && slider->isTextBoxEditable())return false;
+        for(auto* child:c.getChildren())if(!self(self,*child))return false;
+        return true;
+    };
+    surface.setFine(false);
+    if(!focusDisabled(focusDisabled,surface) || surface.keyPressed(juce::KeyPress(juce::KeyPress::spaceKey)))return false;
+    surface.setFine(true);
+    if(!surface.keyPressed(juce::KeyPress(juce::KeyPress::spaceKey)))return false;
+    surface.setFine(false);
+    return focusDisabled(focusDisabled,surface);
+}
 
 bool renderSuitunesEditor(const juce::File& target,bool fine,const juce::File& source) {
     SuitunesProcessor processor;processor.setRateAndBufferSizeDetails(48000,256);processor.prepareToPlay(48000,256);

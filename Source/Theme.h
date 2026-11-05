@@ -1,7 +1,7 @@
 #pragma once
 #include <juce_audio_utils/juce_audio_utils.h>
 namespace suitunes::ui {
-inline const juce::Colour blue{0xff009dff},cyan{0xff37ddff},ink{0xff090d12},panel{0xff141b23},text{0xffedf4fb},muted{0xff8a9caf};
+inline const juce::Colour blue{0xff55dd65},cyan{0xffb5ff70},ink{0xff090d12},panel{0xff141b23},text{0xffedf4fb},muted{0xff8a9caf};
 inline void label(juce::Graphics& g,const juce::String& s,juce::Rectangle<int> bounds,float size,juce::Colour colour=text,int align=juce::Justification::centred) {
     g.setColour(colour); g.setFont(juce::Font(juce::FontOptions(size))); g.drawText(s,bounds,align,true);
 }
@@ -26,10 +26,10 @@ public:
         if(b.getButtonText()=="Auto Tune"||b.getButtonText()=="Fine Tune") {
             juce::Path tab;tab.startNewSubPath(r.getX()+20,r.getY());tab.lineTo(r.getRight(),r.getY());tab.lineTo(r.getRight()-20,r.getBottom());tab.lineTo(r.getX(),r.getBottom());tab.closeSubPath();
             if(on){g.setColour(blue.withAlpha(.15f));g.strokePath(tab,juce::PathStrokeType(8));}
-            g.setGradientFill(juce::ColourGradient(on?juce::Colour(0xff086dbf):juce::Colour(0xff29333d),0,r.getY(),on?juce::Colour(0xff003665):ink,0,r.getBottom(),false));g.fillPath(tab);g.setColour(on?cyan:juce::Colour(0xff65717e));g.strokePath(tab,juce::PathStrokeType(on?1.6f:1.f));return;
+            g.setGradientFill(juce::ColourGradient(on?juce::Colour(0xff258a40):juce::Colour(0xff29333d),0,r.getY(),on?juce::Colour(0xff103e20):ink,0,r.getBottom(),false));g.fillPath(tab);g.setColour(on?cyan:juce::Colour(0xff65717e));g.strokePath(tab,juce::PathStrokeType(on?1.6f:1.f));return;
         }
         if(on&&b.isEnabled()) for(int i=4;i>0;--i) { g.setColour(blue.withAlpha(.035f*float(5-i))); g.drawRoundedRectangle(r.expanded(float(i)),12,2); }
-        auto top=on?juce::Colour(0xff0865b7):juce::Colour(0xff29333d), bottom=on?juce::Colour(0xff003467):juce::Colour(0xff0a0f14);
+        auto top=on?juce::Colour(0xff237d35):juce::Colour(0xff29333d), bottom=on?juce::Colour(0xff113d1e):juce::Colour(0xff0a0f14);
         if(over) top=top.brighter(.15f); if(down) bottom=bottom.brighter(.15f);
         g.setGradientFill(juce::ColourGradient(top.withAlpha(b.isEnabled()?1.f:.4f),0,r.getY(),bottom,r.getRight(),r.getBottom(),false));
         g.fillRoundedRectangle(r,11); g.setColour((on?cyan:juce::Colour(0xff65717e)).withAlpha(b.isEnabled()?.9f:.3f)); g.drawRoundedRectangle(r,11,on?1.6f:1.f);

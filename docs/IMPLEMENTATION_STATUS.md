@@ -1,3 +1,5 @@
+> November 5 Pitch Pop update: current user scope and implementation checkpoint are in [PITCH_POP_AUDIT.md](PITCH_POP_AUDIT.md). Older blue-branding, correction-toggle and default-engine statements below are historical. Natural-vocal/FL acceptance is still open.
+
 # V1 feature status — working prototype 0.2.0
 
 References are to the supplied 27-page `Suitunes-V1.0.0-dev-spec.pdf`. “Implemented” means prototype code and the stated checks exist; musical/host acceptance remains separate.

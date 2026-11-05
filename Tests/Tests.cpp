@@ -7,11 +7,13 @@
 #include "AllocationTrace.h"
 juce::AudioProcessor* JUCE_CALLTYPE createPluginFilter();
 bool renderSuitunesEditor(const juce::File&,bool,const juce::File&);
+bool verifyPitchPopKeyboardPolicy();
 static void check(bool ok, const char* message) { if (!ok) throw std::runtime_error(message); }
 static float tone(double t, double rate, float hz) { return 0.25f * float(std::sin(juce::MathConstants<double>::twoPi * hz * t / rate)); }
 int main(int argc,char** argv) {
   try {
     juce::ScopedJuceInitialiser_GUI gui;
+    check(verifyPitchPopKeyboardPolicy(),"Auto Tune keyboard focus/space policy");
     if(argc>=4&&juce::String(argv[1])=="--snapshot") {
       check(renderSuitunesEditor(juce::File(argv[2]),juce::String(argv[3])=="fine",argc>=5?juce::File(argv[4]):juce::File{}),"Editor snapshot failed");return 0;
     }
@@ -151,7 +153,9 @@ int main(int argc,char** argv) {
     plugin->setStateInformation(saved.getData(),int(saved.getSize()));
     check(std::abs(amount->getValue()-0.37f)<1e-5f,"Host state did not restore parameter");
     plugin->setRateAndBufferSizeDetails(48000,128);plugin->prepareToPlay(48000,128);
-    plugin->getParameters()[0]->setValueNotifyingHost(1);plugin->getParameters()[4]->setValueNotifyingHost(0);plugin->getParameters()[14]->setValueNotifyingHost(1);
+    check(plugin->getName()=="Pitch Pop","Product rename");
+    // Legacy disabled projects/automation must no longer turn correction off.
+    plugin->getParameters()[0]->setValueNotifyingHost(0);plugin->getParameters()[4]->setValueNotifyingHost(0);plugin->getParameters()[14]->setValueNotifyingHost(1);
     plugin->getParameters()[3]->setValueNotifyingHost(1);juce::AudioBuffer<float> processorSignal(2,128);juce::MidiBuffer processorMidi;suitunes::Yin processorOutput;processorOutput.prepare(48000);
     for(int i=0;i<400;++i){processorMidi.clear();if(i==0)processorMidi.addEvent(juce::MidiMessage::noteOn(1,71,juce::uint8(100)),17);for(int j=0;j<128;++j)for(int c=0;c<2;++c)processorSignal.setSample(c,j,tone(i*128+j,48000,440));plugin->processBlock(processorSignal,processorMidi);for(int j=0;j<128;++j)processorOutput.push(processorSignal.getSample(0,j));}
     check(std::abs(1200*std::log2(processorOutput.pitch().hz/493.8833f))<12,"Processor MIDI target did not control pitch");

@@ -14,26 +14,25 @@ static float source(int t, double sr, double hz, bool harmonic) {
 template<class Engine, class Settings> void timing(const char* name, double sr=48000, int block=128, bool enabled=true,suitunes::Mode mode=suitunes::Mode::FullVoice) {
     Engine e;if constexpr(std::is_same_v<Engine,suitunes::Engine>)e.prepare(sr,2,mode);else e.prepare(sr,2);Settings s;s.enabled=enabled;
     juce::AudioBuffer<float> b(2,block); std::vector<double> times; times.reserve(int(sr*3/block)+1);
-    double total=0;
-    for(int start=0;start<int(sr*3);start+=block) {
+    double total=0; int missed=0;
+    for(int start=-int(sr*.25);start<int(sr*3);start+=block) {
         for(int i=0;i<block;++i) for(int c=0;c<2;++c) b.setSample(c,i,source(start+i,sr,223.84,true));
         auto t=Clock::now(); e.process(b,s);
-        double us=std::chrono::duration<double,std::micro>(Clock::now()-t).count(); times.push_back(us); total+=us;
+        double us=std::chrono::duration<double,std::micro>(Clock::now()-t).count(); if(start>=0) { times.push_back(us); total+=us; if(us>block/sr*1e6)++missed; }
     }
     std::sort(times.begin(),times.end());
-    std::cout<<name<<",sr="<<sr<<",block="<<block<<",enabled="<<enabled<<",delay_ms="<<1000.0*e.latencySamples()/sr<<",cpu_percent="<<total/(double(times.size()*block)/sr*10000)<<",p99_us="<<times[size_t(times.size()*.99)]<<",max_us="<<times.back()<<std::endl;
+    std::cout<<name<<",sr="<<sr<<",block="<<block<<",enabled="<<enabled<<",delay_ms="<<1000.0*e.latencySamples()/sr<<",cpu_percent="<<total/(double(times.size()*block)/sr*10000)<<",mean_us="<<total/times.size()<<",p95_us="<<times[size_t(times.size()*.95)]<<",missed_deadlines="<<missed<<",p99_us="<<times[size_t(times.size()*.99)]<<",max_us="<<times.back()<<std::endl;
 }
 int main(int argc,char**) {
     std::cout<<std::fixed<<std::setprecision(3);
     timing<suitunes_baseline::Engine,suitunes_baseline::Settings>("baseline");
     timing<suitunes::Engine,suitunes::Settings>("current");
     if(argc==1) {
-        for(double sr : {44100.0,48000.0,88200.0,96000.0}) for(int block : {64,128,512}) {
+        for(double sr : {44100.0,48000.0,88200.0,96000.0}) for(int block : {32,64,128,512,1024}) {
             timing<suitunes::Engine,suitunes::Settings>("full-voice",sr,block,true);
-            timing<suitunes::Engine,suitunes::Settings>("bypassed",sr,block,false);
+            timing<suitunes::Engine,suitunes::Settings>("live",sr,block,true,suitunes::Mode::Live);
+            timing<suitunes::Engine,suitunes::Settings>("quality",sr,block,true,suitunes::Mode::Spectral);
         }
-        for(double sr:{44100.0,48000.0,88200.0,96000.0})timing<suitunes::Engine,suitunes::Settings>("live",sr,128,true,suitunes::Mode::Live);
-        timing<suitunes::Engine,suitunes::Settings>("spectral",48000,128,true,suitunes::Mode::Spectral);
     }
     if(argc==1) return 0;
     std::cout<<"window_ms,hop_divisor,reported_ms,worst_cents,minimum_output_rms,cpu_percent\n";
