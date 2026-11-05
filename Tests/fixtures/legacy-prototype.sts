@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<SuitunesState schema="1">
+  <PARAM id="enabled" value="1"/>
+  <PARAM id="root" value="0"/>
+  <PARAM id="scale" value="0"/>
+  <PARAM id="amount" value="1"/>
+  <PARAM id="retune" value="40"/>
+  <PARAM id="mix" value="1"/>
+  <PARAM id="bypass" value="0"/>
+</SuitunesState>

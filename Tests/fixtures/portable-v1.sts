@@ -1,0 +1,17 @@
+{
+  "magic": "SUITUNES_STS",
+  "format": "SuitunesPreset",
+  "formatVersion": 1,
+  "productVersion": "0.2.0",
+  "name": "Migration test fixture, not a factory preset",
+  "parameters": {
+    "key": "C",
+    "scale": "minor",
+    "enabledNotes": [0, 2, 3, 5, 7, 8, 10],
+    "speedMs": 40,
+    "correctionStrength": 0.75,
+    "midiControlMode": "off",
+    "futureOptionalSetting": "ignored"
+  },
+  "futureOptionalMetadata": {"fixture": true}
+}
