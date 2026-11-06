@@ -1,5 +1,9 @@
 # Pitch Pop 0.3 engineering checkpoint - November 5, 2026
 
+Later audio-overhaul implementation, actual neural experiments and validation:
+[AUDIO_OVERHAUL.md](AUDIO_OVERHAUL.md). That report supersedes the older target
+dead-band and vocal-corpus status below, while retaining the outstanding FL gates.
+
 ## Authority and preserved baseline
 
 Reviewed all 11 pages of `reference/Suitunes_Pitch_Correction_Research_Specification.pdf`. It expressly describes research/proposed acceptance targets, not an audited V1 or demonstrated Pitcher parity. The user's current request controls scope: Pitch Pop name and green soda theme, always-enabled Auto Tune, FL transport spacebar, preserved Fine Tune editing/selection/Select All/wheel zoom and `.sts`. Earlier blue branding and correction-switch instructions are superseded. Reference PDFs/PNGs and synced `sources/` are unchanged.

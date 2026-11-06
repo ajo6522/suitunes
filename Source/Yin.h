@@ -15,7 +15,7 @@ public:
         factor = std::clamp(int(rate / 12000), 1, 16); sr = rate / factor;
         taps = factor * 16 + 1; filter.fill(0); history.fill(0); ring.fill(0);
         inputPos = write = filled = decimation = sinceAnalysis = 0; result = {};
-        candidateCount=octaveHold=unvoicedHops=0; previousHz=previousRms=0; onset=false;
+        candidateCount=octaveHold=unvoicedHops=0; previousHz=previousRms=rms=0; onset=octaveRejected=false;
         window = std::clamp(int(std::ceil(sr * 0.043)), 256, 1024);
         hop = std::max(1, int(std::round(sr * 0.005)));
         double sum = 0, cutoff = 0.40 / factor;
@@ -68,7 +68,7 @@ private:
             sum+=d; difference[size_t(lag)] = sum>0 ? float(d*lag/sum) : 1;
         }
         for(int lag=minLag;lag<=maxLag;++lag) {
-            if(difference[size_t(lag)]>=0.15f) continue;
+            if(difference[size_t(lag)]>=(previousHz>0 && !onset ? .22f : .15f)) continue;
             if(lag>minLag && difference[size_t(lag)]>difference[size_t(lag-1)]) continue;
             while(lag<maxLag && difference[size_t(lag+1)]<difference[size_t(lag)]) ++lag;
             float a=difference[size_t(lag-1)],b=difference[size_t(lag)],c=difference[size_t(lag+1)],denom=a-2*b+c;

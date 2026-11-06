@@ -1,0 +1,79 @@
+Start testing: Nov 05 20:16 Central Standard Time
+----------------------------------------------------------
+1/3 Testing: SuitunesDSPAndPresets
+1/3 Test: SuitunesDSPAndPresets
+Command: "C:/Users/amahl/.codex/.chatgpt-projects/g-p-6ac3a3c9ac98819199dd97b6b7741fa8/suitunes-repo/build/SuitunesTests_artefacts/Release/SuitunesTests.exe"
+Directory: C:/Users/amahl/.codex/.chatgpt-projects/g-p-6ac3a3c9ac98819199dd97b6b7741fa8/suitunes-repo/build
+"SuitunesDSPAndPresets" start time: Nov 05 20:16 Central Standard Time
+Output:
+----------------------------------------------------------
+sung C3 correct=103 frames=104 octave_errors=0
+sung D3 correct=124 frames=124 octave_errors=0
+sung E3 correct=108 frames=108 octave_errors=0
+sung G3 correct=109 frames=116 octave_errors=0
+sung A3 correct=117 frames=117 octave_errors=0
+sung B3 correct=110 frames=110 octave_errors=0
+Worst harmonic correction error across rates/ranges: 4.49405 cents
+Input detected: 447.924; correction: -0.309726; output detected: 439.991
+Measured corrected pitch: 439.991 Hz; delay: 768 samples at 48 kHz
+PASS: detector, recorded vowels, correction, custom scales, MIDI targets, C++ allocation guard, presets, Fine Tune edits/undo/selection, WAV 24/32, MIDI Type0/1, metadata, 36 processor lifecycles
+<end of output>
+Test time =   1.91 sec
+----------------------------------------------------------
+Test Passed.
+"SuitunesDSPAndPresets" end time: Nov 05 20:16 Central Standard Time
+"SuitunesDSPAndPresets" time elapsed: 00:00:01
+----------------------------------------------------------
+
+2/3 Testing: PitchPopRegression
+2/3 Test: PitchPopRegression
+Command: "C:/Users/amahl/.codex/.chatgpt-projects/g-p-6ac3a3c9ac98819199dd97b6b7741fa8/suitunes-repo/build/Release/PitchPopRegression.exe"
+Directory: C:/Users/amahl/.codex/.chatgpt-projects/g-p-6ac3a3c9ac98819199dd97b6b7741fa8/suitunes-repo/build
+"PitchPopRegression" start time: Nov 05 20:16 Central Standard Time
+Output:
+----------------------------------------------------------
+voice shift=-12 measured=110 error_cents=1.96994e-06
+spectral shift=-12 measured=110.517 error_cents=8.11709
+voice shift=-6 measured=155.563 error_cents=6.19514e-07
+spectral shift=-6 measured=156.898 error_cents=14.7851
+voice shift=-3 measured=184.997 error_cents=3.21898e-05
+spectral shift=-3 measured=186.37 error_cents=12.799
+voice shift=-1 measured=207.652 error_cents=4.04876e-05
+spectral shift=-1 measured=208.461 error_cents=6.73216
+voice shift=0 measured=220 error_cents=6.80363e-07
+spectral shift=0 measured=220 error_cents=5.86314e-07
+voice shift=1 measured=233.082 error_cents=9.57852e-05
+spectral shift=1 measured=234.409 error_cents=9.82807
+voice shift=3 measured=261.626 error_cents=0.000104775
+spectral shift=3 measured=262.074 error_cents=2.96803
+voice shift=6 measured=311.127 error_cents=1.27262e-06
+spectral shift=6 measured=312.627 error_cents=8.32647
+voice shift=12 measured=440 error_cents=2.49561e-06
+spectral shift=12 measured=440.176 error_cents=0.692584
+PASS G minor / target dwell / independent ratio direction / buffer-invariant controller / reset allocations / noise rejection; worst detector cents=7.65972
+<end of output>
+Test time =   0.24 sec
+----------------------------------------------------------
+Test Passed.
+"PitchPopRegression" end time: Nov 05 20:16 Central Standard Time
+"PitchPopRegression" time elapsed: 00:00:00
+----------------------------------------------------------
+
+3/3 Testing: PitchPopOverhaul
+3/3 Test: PitchPopOverhaul
+Command: "C:/Users/amahl/.codex/.chatgpt-projects/g-p-6ac3a3c9ac98819199dd97b6b7741fa8/suitunes-repo/build/Release/PitchPopOverhaul.exe"
+Directory: C:/Users/amahl/.codex/.chatgpt-projects/g-p-6ac3a3c9ac98819199dd97b6b7741fa8/suitunes-repo/build
+"PitchPopOverhaul" start time: Nov 05 20:16 Central Standard Time
+Output:
+----------------------------------------------------------
+maximum_adjacent_sample_step=0.00880738
+PASS bounded dropout, confidence acquisition, onset/reset, frozen grains, stereo coherence, no allocations, true octave
+<end of output>
+Test time =   0.06 sec
+----------------------------------------------------------
+Test Passed.
+"PitchPopOverhaul" end time: Nov 05 20:16 Central Standard Time
+"PitchPopOverhaul" time elapsed: 00:00:00
+----------------------------------------------------------
+
+End testing: Nov 05 20:16 Central Standard Time

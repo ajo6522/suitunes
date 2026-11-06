@@ -41,6 +41,9 @@ int main(int argc,char** argv) {
         for(int i=0;i<block;++i){int dst=start+i-latency;if(dst>=0&&dst<length)for(int c=0;c<channels;++c)rendered.setSample(c,dst,work.getSample(c,i));}
     }
     auto output=folder.getChildFile("corrected.wav").createOutputStream();
+    // JUCE opens existing output streams at EOF. A rerun must replace the WAV,
+    // otherwise the final header is written over the beginning of appended data.
+    if(!output || !output->setPosition(0) || output->truncate().failed())return 3;
     juce::WavAudioFormat wav;
     std::unique_ptr<juce::AudioFormatWriter> writer(output ? wav.createWriterFor(output.get(),sr,unsigned(channels),24,{},0) : nullptr);
     if(!writer)return 3; output.release();

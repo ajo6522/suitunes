@@ -1,0 +1,37 @@
+{
+  "repository": "vocobox/human-voice-dataset",
+  "commit": "77248fc69fd93c40a69d49c0cade4144c5d7a9f4",
+  "description": "Martin, French male singer, Roland R05 microphone; independently recorded sung /a/ notes. MIT license from upstream.",
+  "files": [
+    {
+      "file": "C3.wav",
+      "source": "data/voices/martin/notes/exports/mono/C3.wav",
+      "sha256": "03b4a7cfbd00235b54e118fed5588ab264f7e3af48375dc0bf9d21b17be1e28b"
+    },
+    {
+      "file": "D3.wav",
+      "source": "data/voices/martin/notes/exports/mono/D3.wav",
+      "sha256": "8ff6fb8a44e380ca9cbd7e342a6dda93719b03e0106bb8deeb6dc44f34c8758f"
+    },
+    {
+      "file": "E3.wav",
+      "source": "data/voices/martin/notes/exports/mono/E3.wav",
+      "sha256": "1ffad60e509debb9ebe6037ce1a45f798afac1ffa88401b646d9a2de2d9f4d24"
+    },
+    {
+      "file": "G3.wav",
+      "source": "data/voices/martin/notes/exports/mono/G3.wav",
+      "sha256": "1ef52b32672620eab95b18ee21a2cddd8adbf6e38ebba1200ce03b0948dbc39a"
+    },
+    {
+      "file": "A3.wav",
+      "source": "data/voices/martin/notes/exports/mono/A3.wav",
+      "sha256": "015bd7c8e36f62301886faed572073bff0aae3330ad92471b168bc9b70d076e1"
+    },
+    {
+      "file": "B3.wav",
+      "source": "data/voices/martin/notes/exports/mono/B3.wav",
+      "sha256": "2a94fe05d1918f2f83dc3d70bec2a06f32241be4aafb047a9131d7bf03f09cc3"
+    }
+  ]
+}

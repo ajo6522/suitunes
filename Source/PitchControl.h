@@ -28,18 +28,23 @@ inline float targetNote(float midi, int root, int scale, int mask=4095) {
 class TargetTracker {
 public:
     void reset() { valid=false; pendingMs=0; }
-    float update(float note, int root, int scale, int mask, float elapsedMs, bool onset) {
+    float update(float note, int root, int scale, int mask, float elapsedMs, bool onset, float confidence=1) {
         const float nearest=targetNote(note,root,scale,mask);
         if (!valid || onset || !noteAllowed(int(std::round(held)),root,scale,mask)) {
             held=nearest; valid=true; pendingMs=0; return held;
         }
-        if (nearest==held || std::abs(note-nearest)+0.15f>=std::abs(note-held)) {
+        const float advantage=std::abs(note-held)-std::abs(note-nearest);
+        // Distance advantage is twice the displacement from a midpoint:
+        // .30 semitones here means a 15-cent boundary dead band.
+        if (nearest==held || advantage<=0.30f) {
             pendingMs=0; return held;
         }
         if (nearest!=pending) { pending=nearest; pendingMs=0; }
         pendingMs+=elapsedMs;
         // Large genuine intervals acquire quickly; adjacent notes need dwell.
-        if (pendingMs >= (std::abs(nearest-held)>2 ? 10.0f : 20.0f)) { held=nearest; pendingMs=0; }
+        const float dwell=(std::abs(nearest-held)>2 ? 10.0f : advantage<.5f ? 60.0f : 20.0f)
+            +50*(1-std::clamp(confidence,0.f,1.f));
+        if (pendingMs >= dwell) { held=nearest; pendingMs=0; }
         return held;
     }
 private:

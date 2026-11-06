@@ -17,6 +17,41 @@ int main(int argc,char** argv) {
     if(argc>=4&&juce::String(argv[1])=="--snapshot") {
       check(renderSuitunesEditor(juce::File(argv[2]),juce::String(argv[3])=="fine",argc>=5?juce::File(argv[4]):juce::File{}),"Editor snapshot failed");return 0;
     }
+    // Independently recorded sustained vowels (MIT, provenance beside WAVs).
+    // Nominal note identity is an oracle; these are not samplewise F0 labels.
+    // A3/B3 filenames are misleading: spectral harmonic spacing is ~109/~122
+    // Hz, i.e. A2/B2. See the fixture README for independently checked labels.
+    for(auto entry : {std::pair<const char*,int>{"C3",48},{"D3",50},{"E3",52},{"G3",55},{"A3",45},{"B3",47}}) {
+        juce::File file=juce::File(SUITUNES_FIXTURE_DIR).getChildFile("singing").getChildFile(juce::String(entry.first)+".wav");
+        juce::WavAudioFormat format;
+        std::unique_ptr<juce::AudioFormatReader> reader(format.createReaderFor(file.createInputStream().release(),true));
+        check(bool(reader),"Recorded singing fixture missing");
+        juce::AudioBuffer<float> audio(int(reader->numChannels),int(reader->lengthInSamples));
+        check(reader->read(&audio,0,audio.getNumSamples(),0,true,true),"Singing fixture read");
+        suitunes::Yin detector;detector.prepare(reader->sampleRate);
+        int total=0,correct=0,octaves=0;
+        for(int i=0;i<audio.getNumSamples();++i)if(detector.push(audio.getSample(0,i)) &&
+            i>audio.getNumSamples()/4 && i<audio.getNumSamples()*3/4) {
+            ++total;auto p=detector.pitch();
+            float error=p.hz>0?std::abs(suitunes::midiFromHz(p.hz)-entry.second):100;
+            if(error<.5f)++correct;if(error>11 && error<13)++octaves;
+        }
+        std::cout<<"sung "<<entry.first<<" correct="<<correct<<" frames="<<total<<" octave_errors="<<octaves<<'\n';
+        check(total>10 && correct>total*.8 && octaves==0,"Sustained recorded-note identity");
+        // Process the entire take with varied buffers, formants and key changes.
+        for(auto mode:{suitunes::Mode::FullVoice,suitunes::Mode::Live,suitunes::Mode::Spectral}) {
+            suitunes::Engine engine;engine.prepare(reader->sampleRate,1,mode);
+            suitunes::Settings settings;settings.enabled=true;settings.root=7;settings.scale=2;
+            juce::AudioBuffer<float> block(1,1024);int position=0,iteration=0;
+            while(position<audio.getNumSamples()) {
+                int n=std::min(audio.getNumSamples()-position,iteration++%2?127:1024);
+                block.copyFrom(0,0,audio,0,position,n);
+                engine.process(block,settings,0,n);
+                for(int i=0;i<n;++i)check(std::isfinite(block.getSample(0,i)) && std::abs(block.getSample(0,i))<4,"Recorded voice unbounded");
+                position+=n;
+            }
+        }
+    }
     {juce::File directory(SUITUNES_FIXTURE_DIR);juce::ValueTree legacyFixture,portableFixture;
       check(suitunes::decodePreset(directory.getChildFile("legacy-prototype.sts").loadFileAsString(),legacyFixture).wasOk(),"Frozen legacy STS fixture");
       check(suitunes::stateValue(legacyFixture,"mode")==2,"Legacy fixture did not retain spectral mode");
@@ -202,7 +237,25 @@ int main(int argc,char** argv) {
     // Keep only the explicitly requested preview fixture when useful to developers.
     if(auto folder=juce::SystemStats::getEnvironmentVariable("SUITUNES_TEST_FIXTURE_DIR",{});folder.isNotEmpty()){juce::File destination(folder);destination.createDirectory();wav.copyFileTo(destination.getChildFile("voice-fixture.wav"));}
     r24.reset();r32.reset();check(temp.getParentDirectory()==juce::File::getSpecialLocation(juce::File::tempDirectory),"Unexpected test cleanup path");temp.deleteRecursively();
-    std::cout << "PASS: detector, correction, custom scales, MIDI targets, C++ allocation guard, presets, Fine Tune edits/undo/selection, WAV 24/32, MIDI Type0/1, metadata\n";
+    // Isolated host-like lifecycle stress: simultaneous processors, state loads,
+    // rate/block changes, releases and destruction. No process-global DSP state.
+    // CTest bounds the process; this is not a test inside FL Studio.
+    for(int cycle=0;cycle<12;++cycle) {
+        std::array<std::unique_ptr<juce::AudioProcessor>,3> instances;
+        for(auto& instance:instances) {
+            instance.reset(createPluginFilter());
+            double rate=cycle%2?44100:96000;
+            instance->setRateAndBufferSizeDetails(rate,127);
+            instance->prepareToPlay(rate,127);
+            juce::AudioBuffer<float> b(2,127);juce::MidiBuffer midi;
+            for(int pass=0;pass<16;++pass){b.clear();instance->processBlock(b,midi);}
+            juce::MemoryBlock saved;instance->getStateInformation(saved);
+            instance->setStateInformation(saved.getData(),int(saved.getSize()));
+            instance->releaseResources();
+        }
+        instances[1].reset();instances[0].reset();instances[2].reset();
+    }
+    std::cout << "PASS: detector, recorded vowels, correction, custom scales, MIDI targets, C++ allocation guard, presets, Fine Tune edits/undo/selection, WAV 24/32, MIDI Type0/1, metadata, 36 processor lifecycles\n";
     return 0;
   } catch (const std::exception& e) { std::cerr << "FAIL: " << e.what() << '\n'; return 1; }
 }

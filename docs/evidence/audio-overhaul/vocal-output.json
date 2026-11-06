@@ -1,0 +1,200 @@
+[
+  {
+    "file": "C3",
+    "mode": 0,
+    "nominal_input_midi": 48,
+    "expected_g_minor_midi": 48,
+    "median_output_midi": 48.07283095634152,
+    "median_absolute_cents_from_target": 17.864985901380237,
+    "within_50_cents_fraction": 1.0,
+    "maximum_adjacent_sample_step": 0.02044677734375,
+    "rms": 0.03678695919119682
+  },
+  {
+    "file": "C3",
+    "mode": 1,
+    "nominal_input_midi": 48,
+    "expected_g_minor_midi": 48,
+    "median_output_midi": 48.0768481219372,
+    "median_absolute_cents_from_target": 18.34096711937434,
+    "within_50_cents_fraction": 1.0,
+    "maximum_adjacent_sample_step": 0.02044677734375,
+    "rms": 0.037194732061257105
+  },
+  {
+    "file": "C3",
+    "mode": 2,
+    "nominal_input_midi": 48,
+    "expected_g_minor_midi": 48,
+    "median_output_midi": 48.05257338815227,
+    "median_absolute_cents_from_target": 7.82677963749876,
+    "within_50_cents_fraction": 1.0,
+    "maximum_adjacent_sample_step": 0.019988298416137695,
+    "rms": 0.04283755464663485
+  },
+  {
+    "file": "D3",
+    "mode": 0,
+    "nominal_input_midi": 50,
+    "expected_g_minor_midi": 50,
+    "median_output_midi": 50.03643764515334,
+    "median_absolute_cents_from_target": 4.860408736742272,
+    "within_50_cents_fraction": 1.0,
+    "maximum_adjacent_sample_step": 0.03021240234375,
+    "rms": 0.07081044929286955
+  },
+  {
+    "file": "D3",
+    "mode": 1,
+    "nominal_input_midi": 50,
+    "expected_g_minor_midi": 50,
+    "median_output_midi": 50.039511938629374,
+    "median_absolute_cents_from_target": 4.968541987337005,
+    "within_50_cents_fraction": 1.0,
+    "maximum_adjacent_sample_step": 0.03293263912200928,
+    "rms": 0.07089366221132548
+  },
+  {
+    "file": "D3",
+    "mode": 2,
+    "nominal_input_midi": 50,
+    "expected_g_minor_midi": 50,
+    "median_output_midi": 50.02961353021759,
+    "median_absolute_cents_from_target": 3.3131850654726236,
+    "within_50_cents_fraction": 1.0,
+    "maximum_adjacent_sample_step": 0.027651190757751465,
+    "rms": 0.07447531378175683
+  },
+  {
+    "file": "E3",
+    "mode": 0,
+    "nominal_input_midi": 52,
+    "expected_g_minor_midi": 51,
+    "median_output_midi": 51.03317553056659,
+    "median_absolute_cents_from_target": 5.423255537377258,
+    "within_50_cents_fraction": 1.0,
+    "maximum_adjacent_sample_step": 0.03277587890625,
+    "rms": 0.08869433874456371
+  },
+  {
+    "file": "E3",
+    "mode": 1,
+    "nominal_input_midi": 52,
+    "expected_g_minor_midi": 51,
+    "median_output_midi": 51.03822722437124,
+    "median_absolute_cents_from_target": 5.493203601201202,
+    "within_50_cents_fraction": 1.0,
+    "maximum_adjacent_sample_step": 0.03277587890625,
+    "rms": 0.08864862454994155
+  },
+  {
+    "file": "E3",
+    "mode": 2,
+    "nominal_input_midi": 52,
+    "expected_g_minor_midi": 51,
+    "median_output_midi": 51.0419969577496,
+    "median_absolute_cents_from_target": 4.1996957749603325,
+    "within_50_cents_fraction": 1.0,
+    "maximum_adjacent_sample_step": 0.03188371658325195,
+    "rms": 0.09167962165634028
+  },
+  {
+    "file": "G3",
+    "mode": 0,
+    "nominal_input_midi": 55,
+    "expected_g_minor_midi": 55,
+    "median_output_midi": 55.12738014114734,
+    "median_absolute_cents_from_target": 13.343120406563713,
+    "within_50_cents_fraction": 0.9056603773584906,
+    "maximum_adjacent_sample_step": 0.029132485389709473,
+    "rms": 0.08197286905320754
+  },
+  {
+    "file": "G3",
+    "mode": 1,
+    "nominal_input_midi": 55,
+    "expected_g_minor_midi": 55,
+    "median_output_midi": 55.13327021869032,
+    "median_absolute_cents_from_target": 13.363764351451835,
+    "within_50_cents_fraction": 1.0,
+    "maximum_adjacent_sample_step": 0.030487060546875,
+    "rms": 0.08300969596225193
+  },
+  {
+    "file": "G3",
+    "mode": 2,
+    "nominal_input_midi": 55,
+    "expected_g_minor_midi": 55,
+    "median_output_midi": 55.07018353968944,
+    "median_absolute_cents_from_target": 7.0183539689438135,
+    "within_50_cents_fraction": 1.0,
+    "maximum_adjacent_sample_step": 0.025087714195251465,
+    "rms": 0.0813532035346179
+  },
+  {
+    "file": "A3",
+    "mode": 0,
+    "nominal_input_midi": 45,
+    "expected_g_minor_midi": 45,
+    "median_output_midi": 44.986093563947996,
+    "median_absolute_cents_from_target": 9.696682530373124,
+    "within_50_cents_fraction": 0.9811320754716981,
+    "maximum_adjacent_sample_step": 0.015938997268676758,
+    "rms": 0.05361315223361183
+  },
+  {
+    "file": "A3",
+    "mode": 1,
+    "nominal_input_midi": 45,
+    "expected_g_minor_midi": 45,
+    "median_output_midi": 44.95567528884335,
+    "median_absolute_cents_from_target": 9.935026974783767,
+    "within_50_cents_fraction": 1.0,
+    "maximum_adjacent_sample_step": 0.015597343444824219,
+    "rms": 0.06028134319384195
+  },
+  {
+    "file": "A3",
+    "mode": 2,
+    "nominal_input_midi": 45,
+    "expected_g_minor_midi": 45,
+    "median_output_midi": 44.99702664030188,
+    "median_absolute_cents_from_target": 3.9203031788545672,
+    "within_50_cents_fraction": 1.0,
+    "maximum_adjacent_sample_step": 0.012003898620605469,
+    "rms": 0.0592813532165499
+  },
+  {
+    "file": "B3",
+    "mode": 0,
+    "nominal_input_midi": 47,
+    "expected_g_minor_midi": 46,
+    "median_output_midi": 46.035884985190755,
+    "median_absolute_cents_from_target": 8.638492326337754,
+    "within_50_cents_fraction": 1.0,
+    "maximum_adjacent_sample_step": 0.0230712890625,
+    "rms": 0.06815359342892306
+  },
+  {
+    "file": "B3",
+    "mode": 1,
+    "nominal_input_midi": 47,
+    "expected_g_minor_midi": 46,
+    "median_output_midi": 46.02985174776326,
+    "median_absolute_cents_from_target": 6.008582995758971,
+    "within_50_cents_fraction": 1.0,
+    "maximum_adjacent_sample_step": 0.0230712890625,
+    "rms": 0.06899875690480782
+  },
+  {
+    "file": "B3",
+    "mode": 2,
+    "nominal_input_midi": 47,
+    "expected_g_minor_midi": 46,
+    "median_output_midi": 46.0399652000532,
+    "median_absolute_cents_from_target": 5.154250230196311,
+    "within_50_cents_fraction": 1.0,
+    "maximum_adjacent_sample_step": 0.01800823211669922,
+    "rms": 0.07143876055156041
+  }
+]

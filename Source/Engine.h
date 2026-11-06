@@ -7,6 +7,7 @@
 #include "Yin.h"
 #include "VoiceShifter.h"
 #include "PitchControl.h"
+#include "PitchContinuity.h"
 
 namespace suitunes {
 struct Settings {
@@ -33,10 +34,10 @@ public:
         delay.assign(size_t(channels), std::vector<float>(size_t(latency + 1), 0));
         wet.setSize(channels, quantum); dry.setSize(channels, quantum);
         delayPos = 0; correction = 0; mix.reset(rate, 0.02); mix.setCurrentAndTargetValue(0);
-        observed={};
+        observed={}; continuity.reset();
         samplePosition=lastAnalysisSample=0;
         analysisChannel=0;
-        centreFast=centreSlow=heldTarget=desired=0; tracking=false; lfo=0; targetTracker.reset();
+        centreFast=centreSlow=heldTarget=desired=heldCorrection=0; tracking=false; lfo=0; targetTracker.reset();
         formantSmooth.reset(rate,0.03); formantSmooth.setCurrentAndTargetValue(0);
     }
     int latencySamples() const { return latency; }
@@ -49,8 +50,8 @@ public:
     uint64_t analysisSample() const { return lastAnalysisSample; }
     float requestedSemitones() const { return desired; }
     void reset() {
-        yin.reset(); targetTracker.reset(); observed={}; tracking=false;
-        desired=correction=centreFast=centreSlow=heldTarget=0; lfo=0;
+        yin.reset(); continuity.reset(); targetTracker.reset(); observed={}; tracking=false;
+        desired=heldCorrection=correction=centreFast=centreSlow=heldTarget=0; lfo=0;
         delayPos=0; samplePosition=lastAnalysisSample=0;
         for(auto& channel:delay) std::fill(channel.begin(),channel.end(),0.f);
         if(mode==Mode::Spectral) stretch.reset(); else voice.reset();
@@ -99,35 +100,40 @@ public:
     }
 private:
     void updateTarget(const Settings& s) {
-        desired=0;
-        const auto p=observed;
-        if(!s.enabled || p.hz<minimumHz() || p.confidence<.85f ||
+        const auto p=continuity.update(observed,yin.hopMilliseconds(),yin.isOnset(),minimumHz());
+        if(!s.enabled || p.hz<minimumHz() ||
            (s.midiEnabled ? s.midiTarget<0 : s.scale==3 && s.mask==0)) {
-            tracking=false; targetTracker.reset(); return;
+            desired=heldCorrection=0; tracking=false; targetTracker.reset(); continuity.reset(); return;
         }
+        // A carried frame preserves the last trajectory, never votes for a note.
+        // Parameter restrictions still take effect immediately during a dropout.
+        if(continuity.isCarried() && tracking && !s.midiEnabled &&
+           noteAllowed(int(std::round(heldTarget)),s.root,s.scale,s.mask)) { desired=heldCorrection*s.amount; return; }
         const float note=midiFromHz(p.hz), dt=yin.hopMilliseconds()*.001f;
         if(!tracking || yin.isOnset()) centreFast=centreSlow=note;
         tracking=true;
         const float fast=std::exp(-dt/.05f),slow=std::exp(-dt/.4f);
         centreFast=fast*centreFast+(1-fast)*note;
         centreSlow=slow*centreSlow+(1-slow)*note;
-        heldTarget=s.midiEnabled ? float(s.midiTarget) : targetTracker.update(note,s.root,s.scale,s.mask,dt*1000,yin.isOnset());
+        heldTarget=s.midiEnabled ? float(s.midiTarget) : targetTracker.update(note,s.root,s.scale,s.mask,dt*1000,yin.isOnset(),p.confidence);
         const float residual=note-centreFast, driftComponent=centreFast-centreSlow;
         const float vibratoGain=s.vibratoMode==1 ? 1-s.vibratoDepth : 1;
         lfo=std::fmod(lfo+juce::MathConstants<double>::twoPi*s.vibratoRate*dt,juce::MathConstants<double>::twoPi);
         const float enhancement=s.vibratoMode==2 ? float(std::sin(lfo))*.2f*s.vibratoDepth : 0;
-        desired=std::clamp(heldTarget-centreSlow-s.drift*driftComponent+(vibratoGain-1)*residual+enhancement,-12.0f,12.0f)*s.amount;
+        heldCorrection=std::clamp(heldTarget-centreSlow-s.drift*driftComponent+(vibratoGain-1)*residual+enhancement,-12.0f,12.0f);
+        desired=heldCorrection*s.amount;
     }
     static constexpr int quantum = 64;
     double sr = 48000; int numChannels = 2, latency = 0, delayPos = 0;
     float correction = 0;
     int analysisChannel=0;
-    float centreFast=0,centreSlow=0,heldTarget=0,desired=0;
+    float centreFast=0,centreSlow=0,heldTarget=0,desired=0,heldCorrection=0;
     TargetTracker targetTracker;
     uint64_t samplePosition=0,lastAnalysisSample=0;
     double lfo=0;
     bool tracking=false;
     Yin yin;
+    PitchContinuity continuity;
     Pitch observed;
     Mode mode=Mode::FullVoice;
     VoiceShifter voice;
