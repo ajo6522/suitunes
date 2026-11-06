@@ -1,0 +1,11 @@
+Test project C:/Users/amahl/.codex/.chatgpt-projects/g-p-6ac3a3c9ac98819199dd97b6b7741fa8/suitunes-repo/build
+    Start 1: SuitunesDSPAndPresets
+1/3 Test #1: SuitunesDSPAndPresets ............   Passed    1.91 sec
+    Start 2: PitchPopRegression
+2/3 Test #2: PitchPopRegression ...............   Passed    0.24 sec
+    Start 3: PitchPopOverhaul
+3/3 Test #3: PitchPopOverhaul .................   Passed    0.06 sec
+
+100% tests passed, 0 tests failed out of 3
+
+Total Test time (real) =   2.22 sec

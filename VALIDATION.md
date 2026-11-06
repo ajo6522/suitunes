@@ -1,3 +1,53 @@
+# Pitch Pop 0.3 validation - November 5, 2026
+
+This repair checkpoint is not natural-vocal acceptance. Historical 0.2 results follow below and do not describe the current default engine.
+
+## Current build and objective results
+
+Windows x64 Release, JUCE 8.0.8, MSVC 19.51 / VS Build Tools 2026, Windows SDK 10.0.28000.0. VST3, standalone, tests, diagnostics and benchmark compile. CTest: 2/2 suites pass. Includes Fine Tune selected-range preservation/export, legacy .sts, ignored enabled=0, component space/focus policy, independent G-minor oracle and reset allocations. pluginval strictness 10 with fixed seed 12345 passes on the final bundle (see packaged evidence).
+
+Known-F0 corpus: 36 two-second harmonic chromatic pitches, MIDI 43-78 at alternating +/-30 cents, followed by vibrato/noise/silence stress material. Independent output accuracy is evaluated only in stable held-note interiors (1465 frames), not across the stress material or note transitions:
+
+| Measurement | Observed |
+|---|---:|
+| Detector median absolute error | 0.243 cents |
+| Detector p95 absolute error | 1.982 cents |
+| Target-note assignment in evaluated frames | 100% |
+| Disabled G-minor target classes | 0 |
+| Independent output median absolute error (Quality, Strength 100%, Speed 40 ms) | 1.890 cents |
+| Independent output p95 absolute error | 7.892 cents |
+| Output gross (>50-cent) / octave error fractions | 0 / 0 |
+| Missing output F0 frames in evaluated set | 0 |
+
+Output F0 is measured with separate normalized autocorrelation, not the plugin's YIN. These synthetic results do not establish breathy/consonant handling, formant quality, curated vocal note assignment or Pitcher parity. The separate wide-range detector fixture's worst endpoint error is 7.66 cents. Independent fixed-shifter zero-crossing tests cover 0, +/-1, +/-3, +/-6, +/-12 semitones on both backends; spectral pure-tone results are under 15 cents (this oracle is sensitive to resynthesis residuals).
+
+Quality zero-strength check: aligned PCM24 output versus PCM16 dry corpus, trimming one second at each edge, residual RMS 2.744e-7, peak 8.345e-7 with source RMS 0.10336. This provides a numerical unity reconstruction check, not a vocal identity listening verdict.
+
+## Callback budget and latency
+
+The initial nonsplit spectral configuration missed callback deadlines at 88.2/96 kHz and 32/64-sample buffers. Enabling distributed computation adds 30 ms explicitly to the latency report and reduces work bursts. Current Quality audio delay at 48 kHz is **7200 samples / 150 ms**. Full voice remains 768 / 16 ms; Live 480 / 10 ms (110+ Hz). Fine Tune offline uses its existing 120 ms internal spectral delay, removed during export.
+
+After 0.25 s warmup, three seconds of generated stereo harmonic audio per case, required rates 44.1/48/88.2/96 kHz x buffers 32/64/128/512/1024 x all three current engines: **zero missed deadlines in this run**. This short machine-specific benchmark is not a dropout guarantee or FL soak. Source generation is outside timing. The archive includes both the initial failed unsplit run and final split run.
+
+| Final Quality case | Mean | p95 | Worst | Deadline |
+|---|---:|---:|---:|---:|
+| 48 kHz / 128 | 45.061 us | 77.100 us | 129.400 us | 2666.667 us |
+| 96 kHz / 32 | 9.888 us | 48.300 us | 126.000 us | 333.333 us |
+
+Approximate 48 kHz/128 one-core processing budget: 1.690% Quality. Do not equate this with FL's CPU meter. Detector observation history (~43 ms plus filtering/hop/Speed), shifter delay and device/host round trip remain separate.
+
+## UI and actual host status
+
+Native rendered Auto Tune and Fine Tune snapshots reviewed at 1280x640; green theme and functional editor layout retained. Auto Tune component tree declines keyboard focus and its space handler returns false; Fine Tune handles space. This is component evidence only.
+
+Actual new-build FL keyboard, PDC, MIDI, reopen, export and 30-minute soak are **pending**. FL Studio 2024 was launched in an empty test project, but protected-folder install was denied and computer-use folder-picker errors prevented loading the separate new bundle. Original installed Suitunes was not overwritten. No user song was opened/saved. No Pitcher vocal renders or original dry failure excerpt were available. macOS/AU remains unbuilt here.
+
+The release remains an engineering checkpoint until the [A/B procedure](docs/PITCHER_AB_PROCEDURE.md) and [host checklist](docs/WINDOWS_BUILD_AND_TEST.md) are completed. See [audit](docs/PITCH_POP_AUDIT.md) for remaining algorithm limitations.
+
+---
+
+## Historical 0.2 checkpoint (superseded for current engine defaults)
+
 # Validation — prototype 0.2.0, November 4, 2026
 
 ## User listening result — November 5, 2026

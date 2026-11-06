@@ -1,3 +1,5 @@
+> November 5 Pitch Pop update: current user scope and implementation checkpoint are in [PITCH_POP_AUDIT.md](PITCH_POP_AUDIT.md). Older blue-branding, correction-toggle and default-engine statements below are historical. Natural-vocal/FL acceptance is still open.
+
 # Suitunes authoritative specification
 
 Authority: user-supplied **Suitunes V1 — Versioned Feature Specification and Implementation Documentation**, version `Suitunes V1.0.0-dev-spec`, November 4, 2026, 27 pages. A byte-identical reference is `reference/Suitunes-V1.0.0-dev-spec.pdf`.

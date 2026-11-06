@@ -1,0 +1,58 @@
+CMake is re-running because C:/Users/amahl/.codex/.chatgpt-projects/g-p-6ac3a3c9ac98819199dd97b6b7741fa8/suitunes-repo/build/CMakeFiles/generate.stamp is out-of-date.
+  the file 'C:/Users/amahl/.codex/.chatgpt-projects/g-p-6ac3a3c9ac98819199dd97b6b7741fa8/suitunes-repo/CMakeLists.txt'
+  is newer than 'C:/Users/amahl/.codex/.chatgpt-projects/g-p-6ac3a3c9ac98819199dd97b6b7741fa8/suitunes-repo/build/CMakeFiles/generate.stamp.depend'
+  result='-1'
+-- Selecting Windows SDK version 10.0.28000.0 to target Windows 10.0.22631.
+-- Configuring juceaide
+-- Building juceaide
+-- Exporting juceaide
+-- Testing juceaide
+-- Finished setting up juceaide
+-- Configuring done (1.8s)
+-- Generating done (0.5s)
+-- Build files have been written to: C:/Users/amahl/.codex/.chatgpt-projects/g-p-6ac3a3c9ac98819199dd97b6b7741fa8/suitunes-repo/build
+MSBuild version 18.10.1-1.26427.6+3cd27c13e for .NET Framework
+
+  Checking File Globs
+  Suitunes_rc_lib.vcxproj -> C:\Users\amahl\.codex\.chatgpt-projects\g-p-6ac3a3c9ac98819199dd97b6b7741fa8\suitunes-repo\build\Suitunes_rc_lib.dir\Release\Suitunes_rc_lib.lib
+  juce_vst3_helper.vcxproj -> C:\Users\amahl\.codex\.chatgpt-projects\g-p-6ac3a3c9ac98819199dd97b6b7741fa8\suitunes-repo\build\Release\juce_vst3_helper.exe
+  Plugin.cpp
+  Suitunes.vcxproj -> C:\Users\amahl\.codex\.chatgpt-projects\g-p-6ac3a3c9ac98819199dd97b6b7741fa8\suitunes-repo\build\Suitunes_artefacts\Release\Pitch Pop_SharedCode.lib
+     Creating library C:/Users/amahl/.codex/.chatgpt-projects/g-p-6ac3a3c9ac98819199dd97b6b7741fa8/suitunes-repo/build/Suitunes_artefacts/Release/VST3/Pitch Pop.lib and object C:/Users/amahl/.codex/.chatgpt-projects/g-p-6ac3a3c9ac98819199dd97b6b7741fa8/suitunes-repo/build/Suitunes_artefacts/Release/VST3/Pitch Pop.exp
+  Suitunes_VST3.vcxproj -> C:\Users\amahl\.codex\.chatgpt-projects\g-p-6ac3a3c9ac98819199dd97b6b7741fa8\suitunes-repo\build\Suitunes_artefacts\Release\VST3\Pitch Pop.vst3\Contents\x86_64-win\Pitch Pop.vst3
+  removing moduleinfo.json
+  creating C:/Users/amahl/.codex/.chatgpt-projects/g-p-6ac3a3c9ac98819199dd97b6b7741fa8/suitunes-repo/build/Suitunes_artefacts/Release/VST3/Pitch Pop.vst3/Contents/Resources/moduleinfo.json
+MSBuild version 18.10.1-1.26427.6+3cd27c13e for .NET Framework
+
+  Checking File Globs
+  Suitunes_rc_lib.vcxproj -> C:\Users\amahl\.codex\.chatgpt-projects\g-p-6ac3a3c9ac98819199dd97b6b7741fa8\suitunes-repo\build\Suitunes_rc_lib.dir\Release\Suitunes_rc_lib.lib
+  Suitunes.vcxproj -> C:\Users\amahl\.codex\.chatgpt-projects\g-p-6ac3a3c9ac98819199dd97b6b7741fa8\suitunes-repo\build\Suitunes_artefacts\Release\Pitch Pop_SharedCode.lib
+  Suitunes_Standalone.vcxproj -> C:\Users\amahl\.codex\.chatgpt-projects\g-p-6ac3a3c9ac98819199dd97b6b7741fa8\suitunes-repo\build\Suitunes_artefacts\Release\Standalone\Pitch Pop.exe
+MSBuild version 18.10.1-1.26427.6+3cd27c13e for .NET Framework
+
+  Checking File Globs
+  SuitunesTests_rc_lib.vcxproj -> C:\Users\amahl\.codex\.chatgpt-projects\g-p-6ac3a3c9ac98819199dd97b6b7741fa8\suitunes-repo\build\SuitunesTests_rc_lib.dir\Release\SuitunesTests_rc_lib.lib
+  Suitunes.vcxproj -> C:\Users\amahl\.codex\.chatgpt-projects\g-p-6ac3a3c9ac98819199dd97b6b7741fa8\suitunes-repo\build\Suitunes_artefacts\Release\Pitch Pop_SharedCode.lib
+  Tests.cpp
+  SuitunesTests.vcxproj -> C:\Users\amahl\.codex\.chatgpt-projects\g-p-6ac3a3c9ac98819199dd97b6b7741fa8\suitunes-repo\build\SuitunesTests_artefacts\Release\SuitunesTests.exe
+MSBuild version 18.10.1-1.26427.6+3cd27c13e for .NET Framework
+
+  Checking File Globs
+  PitchRegression.cpp
+  PitchPopRegression.vcxproj -> C:\Users\amahl\.codex\.chatgpt-projects\g-p-6ac3a3c9ac98819199dd97b6b7741fa8\suitunes-repo\build\Release\PitchPopRegression.exe
+MSBuild version 18.10.1-1.26427.6+3cd27c13e for .NET Framework
+
+  Checking File Globs
+  EngineOverhaul.cpp
+  PitchPopOverhaul.vcxproj -> C:\Users\amahl\.codex\.chatgpt-projects\g-p-6ac3a3c9ac98819199dd97b6b7741fa8\suitunes-repo\build\Release\PitchPopOverhaul.exe
+MSBuild version 18.10.1-1.26427.6+3cd27c13e for .NET Framework
+
+  Checking File Globs
+  PitchPopDiagnostics_rc_lib.vcxproj -> C:\Users\amahl\.codex\.chatgpt-projects\g-p-6ac3a3c9ac98819199dd97b6b7741fa8\suitunes-repo\build\PitchPopDiagnostics_rc_lib.dir\Release\PitchPopDiagnostics_rc_lib.lib
+  Diagnostics.cpp
+  PitchPopDiagnostics.vcxproj -> C:\Users\amahl\.codex\.chatgpt-projects\g-p-6ac3a3c9ac98819199dd97b6b7741fa8\suitunes-repo\build\PitchPopDiagnostics_artefacts\Release\PitchPopDiagnostics.exe
+MSBuild version 18.10.1-1.26427.6+3cd27c13e for .NET Framework
+
+  Checking File Globs
+  Benchmark.cpp
+  SuitunesBench.vcxproj -> C:\Users\amahl\.codex\.chatgpt-projects\g-p-6ac3a3c9ac98819199dd97b6b7741fa8\suitunes-repo\build\Release\SuitunesBench.exe

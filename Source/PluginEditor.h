@@ -12,13 +12,13 @@ public:
         const bool reopenFine=int(proc.metadata().getProperty("viewMode",0))==1;
         auditionOriginal=bool(proc.metadata().getProperty("fineAudition",false));
         setLookAndFeel(&theme);
-        for(auto* button:{&autoTab,&fineTab,&save,&reset,&menu,&enable,&midi,&autoFine,&importWav,&selectAll,&undo,&redo,&split,&selectTool,&splitTool,&play,&stop,&original,&corrected,&exportWav,&exportMidi,&snap,&editPitch,&editTiming,&editVibrato}) addAndMakeVisible(button);
+        for(auto* button:{&autoTab,&fineTab,&save,&reset,&menu,&midi,&autoFine,&importWav,&selectAll,&undo,&redo,&split,&selectTool,&splitTool,&play,&stop,&original,&corrected,&exportWav,&exportMidi,&snap,&editPitch,&editTiming,&editVibrato}) addAndMakeVisible(button);
         for(auto* box:{&preset,&key,&scale,&vibrato,&engine}) addAndMakeVisible(box);
         for(auto* knob:{&formant,&speed,&strength,&depth,&rate,&drift}) addAndMakeVisible(knob);
         addAndMakeVisible(timeline);
         key.addItemList(suitunes::keyNames,1); scale.addItemList({"Chromatic","Major","Minor","Custom"},1);
         vibrato.addItemList({"Preserve","Reduce","Enhance"},1);
-        engine.addItemList({"Full voice | 16 ms | 65+ Hz","Live | 10 ms | 110+ Hz","Spectral | 120 ms | Formants"},1);
+        engine.addItemList({"Experimental | 16 ms | 65+ Hz","Experimental | 10 ms | 110+ Hz","Quality | 150 ms | Formants"},1);
         comboAttachments.push_back(std::make_unique<ComboAttachment>(proc.state,"root",key));
         comboAttachments.push_back(std::make_unique<ComboAttachment>(proc.state,"scale",scale));
         comboAttachments.push_back(std::make_unique<ComboAttachment>(proc.state,"vibratoMode",vibrato));
@@ -29,8 +29,7 @@ public:
         formant.slider.textFromValueFunction=[](double v){return (v>0?"+":"")+juce::String(v,1)+" st";};
         rate.slider.textFromValueFunction=[](double v){return juce::String(v,1)+" Hz";};
         for(auto* knob:{&formant,&speed,&strength,&depth,&rate,&drift})knob->slider.updateText();
-        enable.setClickingTogglesState(true);midi.setClickingTogglesState(true);
-        buttonAttachments.push_back(std::make_unique<ButtonAttachment>(proc.state,"enabled",enable));
+        midi.setClickingTogglesState(true);
         buttonAttachments.push_back(std::make_unique<ButtonAttachment>(proc.state,"midi",midi));
         speed.slider.setTooltip("Lower milliseconds = faster, harder correction. Double-click resets to 40 ms."); speed.slider.setDoubleClickReturnValue(true,40);
         strength.slider.setTooltip("How much correction is applied: 0-100%.");strength.slider.setDoubleClickReturnValue(true,1);
@@ -81,17 +80,22 @@ public:
     void paint(juce::Graphics& g) override {
         using namespace suitunes::ui;
         g.fillAll(juce::Colour(0xff070b10));
-        g.setGradientFill(juce::ColourGradient(juce::Colour(0xff23313d),640,0,juce::Colour(0xff090d12),640,640,false));g.fillRect(getLocalBounds());
-        // Metallic frame, blue edge lighting and procedural wordmark scale cleanly.
+        g.setGradientFill(juce::ColourGradient(juce::Colour(0xff203d2a),640,0,juce::Colour(0xff090f0b),640,640,false));g.fillRect(getLocalBounds());
+        // Carbonation bubbles and green glass highlights, drawn as scalable UI.
+        for(int i=0;i<9;++i) {
+            float x=790.f+float((i*31)%180), y=12.f+float((i*13)%45), r=2.f+float(i%3);
+            g.setColour(cyan.withAlpha(.18f)); g.drawEllipse(x,y,r*2,r*2,1);
+        }
         for(int i=0;i<5;++i) { g.setColour(blue.withAlpha(.025f*float(5-i)));g.drawHorizontalLine(71+i,20.f,1260.f); }
         g.setColour(blue);g.drawHorizontalLine(72,24.f,1256.f);
         juce::Font logo(juce::FontOptions(48,juce::Font::bold|juce::Font::italic));g.setFont(logo);
-        g.setGradientFill(juce::ColourGradient(juce::Colours::white,540,5,juce::Colour(0xff9caab7),540,53,false));g.drawText("Suit",juce::Rectangle<int>(485,0,128,55),juce::Justification::centredRight);
-        g.setGradientFill(juce::ColourGradient(cyan,630,5,blue.darker(.2f),630,53,false));g.drawText("unes",juce::Rectangle<int>(610,0,148,55),juce::Justification::centredLeft);
+        g.setGradientFill(juce::ColourGradient(juce::Colours::white,540,5,juce::Colour(0xff9caab7),540,53,false));g.drawText("Pitch",juce::Rectangle<int>(475,0,150,55),juce::Justification::centredRight);
+        g.setGradientFill(juce::ColourGradient(cyan,630,5,blue.darker(.2f),630,53,false));g.drawText("Pop",juce::Rectangle<int>(625,0,135,55),juce::Justification::centredLeft);
         for(int i=0;i<7;++i) {float h=float(10+int(24*std::sin((i+1)*.42)));g.setColour(i%2?blue:cyan);g.fillRoundedRectangle(444.f+i*5.5f,29-h*.5f,3,h,1.5f);}
         label(g,"V O C A L   P I T C H   C O R R E C T I O N",{455,52,360,15},9.5f,text);
         if(!fine) paintAuto(g);else paintFine(g);
         card(g,{10,581,1260,57},false,15);
+        if(!fine) label(g,"CORRECTION ALWAYS ON",{26,592,164,22},10,cyan);
         paintMeter(g,1000,600,proc.inputLevel.load(),"INPUT");paintMeter(g,1158,600,proc.outputLevel.load(),"OUTPUT");
         label(g,status,{24,621,1232,13},9.5f,muted,juce::Justification::centredLeft);
     }
@@ -103,7 +107,7 @@ public:
             for(int i=0;i<12;++i)noteButtons[size_t(i)].setBounds(505+i*59,175,53,34);
             formant.setBounds(49,251,172,169);speed.setBounds(260,240,222,182);strength.setBounds(502,240,222,182);
             vibrato.setBounds(772,260,193,32);depth.setBounds(769,305,98,113);rate.setBounds(874,305,98,113);drift.setBounds(1050,251,172,169);
-            midi.setBounds(199,587,125,31);enable.setBounds(30,587,157,31);engine.setBounds(346,587,286,31);
+            midi.setBounds(199,587,125,31);engine.setBounds(346,587,286,31);
         } else {
             key.setBounds(208,173,104,32);scale.setBounds(333,173,141,32);autoFine.setBounds(505,167,244,44);snap.setBounds(779,171,218,35);
             importWav.setBounds(24,462,131,36);selectAll.setBounds(191,223,102,30);undo.setBounds(300,223,69,30);redo.setBounds(375,223,69,30);split.setBounds(450,223,65,30);
@@ -123,14 +127,29 @@ public:
         proc.metadata().setProperty("viewMode",fine?1:0,nullptr);
         proc.fineViewActive=fine;
         for(auto* c:std::initializer_list<juce::Component*>{&timeline,&autoFine,&snap,&importWav,&selectAll,&undo,&redo,&split,&selectTool,&splitTool,&play,&stop,&original,&corrected,&exportWav,&exportMidi,&editPitch,&editTiming,&editVibrato})c->setVisible(fine);
-        for(auto* c:std::initializer_list<juce::Component*>{&drift,&rate,&midi,&enable,&engine})c->setVisible(!fine);
+        for(auto* c:std::initializer_list<juce::Component*>{&drift,&rate,&midi,&engine})c->setVisible(!fine);
         for(auto& button:noteButtons)button.setVisible(!fine);
         speed.title(fine?"TRANSITION":"SPEED");strength.title(fine?"STRENGTH":"CORRECTION STRENGTH");
         formant.setEnabled(fine||proc.activeMode.load()==2);
+        // Numeric editors create focusable children on demand. Auto Tune uses
+        // knob dragging so a newly-created text editor cannot swallow transport.
+        for(auto* knob:{&formant,&speed,&strength,&depth,&rate,&drift})knob->slider.setTextBoxIsEditable(fine);
+        configureFocus(*this,fine);
+        if(fine && isShowing()) grabKeyboardFocus();
+        else if(!fine && hasKeyboardFocus(true)) giveAwayKeyboardFocus();
         resized();repaint();
+    }
+    bool keyPressed(const juce::KeyPress& key) override {
+        if(fine && key.isKeyCode(juce::KeyPress::spaceKey)) { play.onClick(); return true; }
+        return false;
     }
     bool isFine() const {return fine;}
 private:
+    static void configureFocus(juce::Component& component,bool allow) {
+        component.setWantsKeyboardFocus(allow);
+        component.setMouseClickGrabsKeyboardFocus(allow);
+        for(auto* child:component.getChildren()) configureFocus(*child,allow);
+    }
     void attach(suitunes::ui::Knob& knob,const char* id) {sliderAttachments.push_back(std::make_unique<SliderAttachment>(proc.state,id,knob.slider));}
     void paintAuto(juce::Graphics& g) {
         using namespace suitunes::ui;
@@ -145,7 +164,7 @@ private:
         float hz=proc.hz.load(),note=hz>0?suitunes::midiFromHz(hz):0;
         label(g,noteName(note),{33,469,142,60},42,cyan);
         label(g,hz>0?juce::String(hz,1)+" Hz":"Waiting for vocal",{30,542,148,20},11,muted);
-        float target=hz>0?note+proc.shift.load():0;
+        float target=proc.target.load();
         label(g,"TARGET "+noteName(target),{1068,453,176,22},13,text);
         label(g,(proc.shift.load()>0?"+":"")+juce::String(int(std::round(proc.shift.load()*100)))+" cents",{1068,479,176,30},18,cyan);
         label(g,"Confidence "+juce::String(int(std::round(proc.confidence.load()*100)))+"%",{1068,541,176,20},11,muted);
@@ -175,7 +194,6 @@ private:
         syncNotes();formant.setEnabled(fine||proc.activeMode.load()==2);
         rate.setEnabled(settings.vibratoMode==2);depth.setEnabled(settings.vibratoMode!=0);
         if(fine&&!busy&&rerenderAfter>0&&juce::Time::getMillisecondCounterHiRes()>rerenderAfter){rerenderAfter=0;renderSession();}
-        enable.setButtonText(settings.enabled?"Correction ON":"Correction OFF");
         midi.setButtonText(settings.midiEnabled?"MIDI Control":"Scale Follow");
         if(!busy){bool loaded=bool(proc.fineSession);for(auto* b:{&autoFine,&selectAll,&split,&play,&stop,&original,&corrected,&exportWav,&exportMidi})b->setEnabled(loaded);undo.setEnabled(loaded&&!proc.fineSession->undoHistory.empty());redo.setEnabled(loaded&&!proc.fineSession->redoHistory.empty());}
         play.setToggleState(proc.previewPlaying.load(),juce::dontSendNotification);original.setToggleState(auditionOriginal,juce::dontSendNotification);corrected.setToggleState(!auditionOriginal,juce::dontSendNotification);
@@ -263,7 +281,7 @@ private:
         auto safe=juce::Component::SafePointer<SuitunesSurface>(this);choose("Import MIDI target melody (first note track)","*.mid;*.midi",false,[safe](auto file){if(!safe)return;auto s=safe->proc.fineSession;auto r=s->importMidi(file);if(r.failed())safe->error(r.getErrorMessage());else safe->renderSession();});
     }
     void choosePreset(bool saving) {
-        auto safe=juce::Component::SafePointer<SuitunesSurface>(this);choose(saving?"Save custom Suitunes preset":"Load Suitunes preset","*.sts",saving,[safe,saving](auto file){
+        auto safe=juce::Component::SafePointer<SuitunesSurface>(this);choose(saving?"Save custom Pitch Pop preset":"Load Pitch Pop / legacy .sts preset","*.sts",saving,[safe,saving](auto file){
             if(!safe)return;if(!saving){safe->loadPresetFile(file);return;}file=file.withFileExtension("sts");auto r=suitunes::savePreset(safe->proc.state,file);if(r.failed())safe->error(r.getErrorMessage());else{safe->presetFiles.addIfNotAlreadyThere(file);safe->refreshPresets(file);safe->status="Saved "+file.getFileName();}
         });
     }
@@ -276,16 +294,16 @@ private:
     void resetSettings() {for(auto& p:suitunes::parameters){auto* parameter=proc.state.getParameter(p.id);parameter->beginChangeGesture();parameter->setValueNotifyingHost(parameter->convertTo0to1(float(p.initial)));parameter->endChangeGesture();}refreshPresets();status="Settings reset. Custom preset files were kept.";}
     void showMenu() {
         juce::PopupMenu m;m.addItem(1,"Load .sts preset...");m.addItem(2,"Import vocal WAV...");m.addItem(3,"Import MIDI melody...");m.addSeparator();m.addItem(4,"WAV export: 24-bit PCM",true,exportBits==24);m.addItem(5,"WAV export: 32-bit float",true,exportBits==32);m.addItem(6,"Export selected range only",true,exportSelected);m.addSeparator();m.addItem(7,"About this prototype / limitations");
-        auto safe=juce::Component::SafePointer<SuitunesSurface>(this);m.showMenuAsync(juce::PopupMenu::Options().withTargetComponent(menu),[safe](int result){if(!safe)return;switch(result){case 1:safe->choosePreset(false);break;case 2:safe->setFine(true);safe->chooseWav();break;case 3:safe->chooseMidi();break;case 4:safe->exportBits=24;break;case 5:safe->exportBits=32;break;case 6:safe->exportSelected=!safe->exportSelected;break;case 7:juce::AlertWindow::showMessageBoxAsync(juce::MessageBoxIconType::InfoIcon,"Suitunes 0.2 prototype","Built from Suitunes V1.0.0-dev-spec.\n\nLive: 10ms, input 110+ Hz. Full voice: 16ms, input 65+ Hz. Spectral: 120ms, formant processing. Low-latency formant preservation is not implemented.\n\nFine Tune: import, selection correction, pitch drag, split, undo/redo, WAV/MIDI export and first-track MIDI guidance. Timing edits and detailed vibrato editing are not implemented. Keep the source WAV available for project restoration.\n\nActual-vocal listening, 30-minute host soak and macOS validation remain required.");break;default:break;}});
+        auto safe=juce::Component::SafePointer<SuitunesSurface>(this);m.showMenuAsync(juce::PopupMenu::Options().withTargetComponent(menu),[safe](int result){if(!safe)return;switch(result){case 1:safe->choosePreset(false);break;case 2:safe->setFine(true);safe->chooseWav();break;case 3:safe->chooseMidi();break;case 4:safe->exportBits=24;break;case 5:safe->exportBits=32;break;case 6:safe->exportSelected=!safe->exportSelected;break;case 7:juce::AlertWindow::showMessageBoxAsync(juce::MessageBoxIconType::InfoIcon,"Pitch Pop 0.3 prototype","Built from Suitunes V1.0.0-dev-spec.\n\nLive: 10ms, input 110+ Hz. Full voice: 16ms, input 65+ Hz. Spectral: 150ms, formant processing. Low-latency formant preservation is not implemented.\n\nFine Tune: import, selection correction, pitch drag, split, undo/redo, WAV/MIDI export and first-track MIDI guidance. Timing edits and detailed vibrato editing are not implemented. Keep the source WAV available for project restoration.\n\nActual-vocal listening, 30-minute host soak and macOS validation remain required.");break;default:break;}});
     }
-    void error(const juce::String& message) {status=message;juce::AlertWindow::showMessageBoxAsync(juce::MessageBoxIconType::WarningIcon,"Suitunes",message);}
+    void error(const juce::String& message) {status=message;juce::AlertWindow::showMessageBoxAsync(juce::MessageBoxIconType::WarningIcon,"Pitch Pop",message);}
     SuitunesProcessor& proc;
     suitunes::ui::Theme theme;
     juce::TooltipWindow tooltips{this,650};
     suitunes::ui::Knob formant{"FORMANT"},speed{"SPEED"},strength{"CORRECTION STRENGTH"},depth{"DEPTH"},rate{"RATE"},drift{"PITCH DRIFT"};
     juce::ComboBox preset,key,scale,vibrato,engine;
     std::array<juce::TextButton,12> noteButtons;
-    juce::TextButton autoTab{"Auto Tune"},fineTab{"Fine Tune"},save{"Save"},reset{"Reset"},menu{"Menu"},enable{"Correction OFF"},midi{"Scale Follow"};
+    juce::TextButton autoTab{"Auto Tune"},fineTab{"Fine Tune"},save{"Save"},reset{"Reset"},menu{"Menu"},midi{"Scale Follow"};
     juce::TextButton autoFine{"Auto Fine Tune"},importWav{"Import WAV"},selectAll{"Select All"},undo{"Undo"},redo{"Redo"},split{"Split"},selectTool{"Select"},splitTool{"Split"};
     juce::TextButton play{"Play"},stop{"Stop"},original{"Original"},corrected{"Corrected"},exportWav{"Export WAV"},exportMidi{"Export MIDI"},snap{"Snap to Scale"};
     juce::TextButton editPitch{"Edit Pitch"},editTiming{"Edit Timing | later"},editVibrato{"Edit Vibrato | later"};
@@ -307,6 +325,7 @@ private:
 class SuitunesEditor final : public juce::AudioProcessorEditor {
 public:
     explicit SuitunesEditor(SuitunesProcessor& p):AudioProcessorEditor(p),surface(p) {
+        setWantsKeyboardFocus(false);setMouseClickGrabsKeyboardFocus(false);
         addAndMakeVisible(surface);setResizable(true,true);setResizeLimits(960,480,1920,960);getConstrainer()->setFixedAspectRatio(2.0);setSize(1280,640);
     }
     void resized() override {surface.setBounds(0,0,1280,640);surface.setTransform(juce::AffineTransform::scale(float(getWidth())/1280.f,float(getHeight())/640.f));}
